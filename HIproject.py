@@ -16,7 +16,7 @@ def FTPlogin():
 
 def dateTime():
     #dTime = datetime.datetime.today()
-    dTime = datetime.datetime(2020, 12, 21)
+    dTime = datetime.datetime(2022, 5, 12)
     return dTime
 
 class dateObj():
@@ -68,53 +68,7 @@ class DateOBJSTR():
 today = dateTime()
 dateOBJ = dateObj(today)
 
-#def timeFunc():
-
-
-#    dTime = datetime.datetime.today()
-
-#    dateObject = dateObj(dTime)
-    # dateObjectString = DateOBJSTR()
-    # d = datetime.datetime.today()
-    # YYYY = d.year
-    # MM = d.month
-    # DD = d.day
-    #
-    # if DD >= 20:
-    #     MM = MM + 1
-    #
-    # strY = str(YYYY)
-    # strM = str(MM)
-    # dash = '-'
-    # underScr = '_'
-    # albumStr = "album"
-    # imagesStr = "images"
-    #
-    # folderName1 = strY + dash + strM + albumStr
-    # folderName2 = strY + underScr + strM + underScr + imagesStr
-
-    ##this code block was meant to test locally
-    #print(YYYY, '-', MM)
-    #createFolder(folderName1)
-    #createFolder(folderName2)
-
-    #FTPLoginFolderCreation(folderName1, folderName2)
-#    return folderName1
-
-
-#this function was meant to test locally
-#def createFolder(directory):
-
-    #try:
-    #    os.makedirs(directory)
-    #except OSError:
-    #    print("Error: Creating" + directory)
-    #else:
-        #print("Directory created sucessfully %s" % directory)
-
-
 def FTPLoginFolderCreation():
-
 
     dir2 = dateOBJ.dateObjStr.updateFolderName
     dir1 = dateOBJ.dateObjStr.updateFolderName2
@@ -122,17 +76,11 @@ def FTPLoginFolderCreation():
     ftp.dir('T1')
     ftp.mkd('T1/images/' + dir1)
     dirSaver = ftp.mkd('T1/monthly_albums/' + dir2)
-#zip_file = 'C:\temp\images.zip'
-#Unzip, then send it to the FTP server (send files?)
-    #1st set of parenthesis will hold the path
-    #in the final version this should be temp's path
-    #with ZipFile(zip_file, 'r') as zip_ref:
-        #zip_ref.extractall(directory)
-
 
 
 def FTPUpload(path, ftp):
 
+    #recursively uploads all the files to the FTP server
     os.chdir(path)
     files = os.listdir(path)
     for i in files:
@@ -150,6 +98,8 @@ def FTPUpload(path, ftp):
 
 def unzip():
 
+    #C:\\temp directory given from Trello
+    #unzips the images.zip file.
     temp_dir = 'C:\\temp'
     file_name = "images.zip"
     os.chdir(temp_dir)
@@ -160,33 +110,15 @@ def unzip():
 
 def AlbumCreation():
 
+    #this changes the directory to where jAlbum was installed on my
+    #machine, which was the Program Files folder
     subprocess.call(['runas','/user:Administrator'])
     os.chdir("C:\\Program Files\\jAlbum")
+    #this is run on command line
     subprocess.run("java -jar JAlbum.jar -directory C:\\temp -outputDirectory C:\\temp\\album")
 
 def textUpdateFuncHTML():
 
-    #download the file from ftp
-    #edit it with new data
-    #upload it back
-    #
-    #
-
-    print ("Entering textupdatefunction...")
-    # d = datetime.datetime.today()
-    # YYYY = d.year
-    # MM = d.month
-    # DD = d.day
-    #
-    # if DD >= 20:
-    #     MM = MM + 1
-    #
-    # strY = str(YYYY)
-    # strM = str(MM)
-    # dash = '-'
-    # albumStr = "album"
-    #
-    # updatedFolderName = strY + dash + strM + albumStr
     FTPfileName = "index1.html"
     updatedFolderName = dateOBJ.dateObjStr.updateFolderName
 
@@ -194,6 +126,9 @@ def textUpdateFuncHTML():
     ftp = FTPlogin()
     ftp.cwd('/')
 
+    #Note: this string below must be in the index1.html file
+    #on like 166 for this to work, this is a HTML comment used
+    #to direct where the line needed to be replaced.
     lineToReplace = '<!-- Insert new line-->'
     replacementLine = '<td align="left" valign="top"><a href="http://www.site.com/Albums/monthly_albums/' + updatedFolderName + '/"><img src="newsbanner.png" width="296" height="36" border="0" align="left" valign="top"></a>\n'
 
@@ -201,6 +136,8 @@ def textUpdateFuncHTML():
     with open(FTPfileName, "wb") as file:
         ftp.retrbinary(f"RETR {FTPfileName}", file.write)
 
+    #this chunk of code looks for the comment and replaces the line after
+    #that comment as needed.
     with open(FTPfileName, 'r+') as file:
         HTMLfilelines = file.readlines()
         for i in range(0, len(HTMLfilelines)):
@@ -210,18 +147,6 @@ def textUpdateFuncHTML():
                 with open(FTPfileName , 'w') as file:
                     file.writelines(HTMLfilelines)
 
-
-        #readFile = open(FTPfileName).read()
-        #readFile = readFile.replace(lineToReplace, replacementLine + '\n')
-
-#    HTMLfile = open("index1.html", "r+")
-#    line_list = HTMLfile.readlines()
-#    HTMLfile.truncate(0)
-
-#    line_list[165] = '<td align="left" valign="top"><a href="http://www.site.com/Albums/monthly_albums/' + updatedFolderName + '/"><img src="newsbanner.png" width="296" height="36" border="0" align="left" valign="top"></a>'
-#    HTMLfile.writelines(line_list)
-#    HTMLfile.close()
-
     with open('index1.html', 'rb') as f:
         ftp.storlines('STOR %s' % 'index1.html', f)
 
@@ -229,24 +154,6 @@ def textUpdateFuncHTML():
 
 
 def textUpdateJS():
-
-    #
-    # d = datetime.datetime.today()
-    # YYYY = d.year
-    # MM = d.month
-    # DD = d.day
-    #
-    # if DD >= 20:
-    #     MM = MM + 1
-    #
-    # strY = str(YYYY)
-    # strM = str(MM)
-    # dash = '-'
-    # albumStr = "album"
-    # strMPrior = str(MM-1)
-    #
-    # updatedFolderName = strY + dash + strM + albumStr
-    # updatedFolderNamePrior = strY + dash + strMPrior + albumStr
 
     updatedFolderName = dateOBJ.dateObjStr.updateFolderName
     updatedFolderNamePrior = dateOBJ.dateObjStr.updateFolderNamePrior
@@ -262,7 +169,8 @@ def textUpdateJS():
     with open('navigation1.js', 'r') as file:
         JSfilelines = file.readlines()
 
-    JSfilelines[141] = '    document.write(\'										<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href = "http://www.site.com/Albums/monthly_albums/" '  + updatedFolderName + '/ onMouseOver="glow(\\\'sub13\\\', \\\'sub13on\\\')" onMouseOut="glow(\\\'sub13\\\', \\\'sub13off\\\')"><img src="images/buttonsV2/inactive.CurrentMonth.png" name = "sub13"></a>\');\n'
+    #calling the lines that need to be replaced directly.
+    JSfilelines[141] = '    document.write(\'										<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href = "http://www.site.com/Albums/monthly_albums/'  + updatedFolderName + '/" onMouseOver="glow(\\\'sub13\\\', \\\'sub13on\\\')" onMouseOut="glow(\\\'sub13\\\', \\\'sub13off\\\')"><img src="images/buttonsV2/inactive.CurrentMonth.png" name = "sub13"></a>\');\n'
 
     JSfilelines[142] = '    document.write(\'										<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<a href = "http://www.site.com/Albums/monthly_albums/' + updatedFolderNamePrior + '/" onMouseOver="glow(\\\'sub14\\\', \\\'sub14on\\\')" onMouseOut="glow(\\\'sub14\\\', \\\'sub14off\\\')"><img src="images/buttonsV2/inactive.PreviousMonth.png" name = "sub14"></a>\');\n'
 
@@ -279,30 +187,11 @@ def textUpdateJS():
 
 def textUpdateArchive():
 
-
-    # d = datetime.datetime.today()
-    # YYYY = d.year
-    # MM = d.month
-    # DD = d.day
-    #
-    #
-    # if DD >= 20:
-    #     MM = MM + 1
-    #     MN = calendar.month_name[MM]
-    #
-    # strY = str(YYYY)
-    # strM = str(MM)
-    # dash = '-'
-    # underScr = '_'
-    # albumStr = "album"
-    # imagesStr = "images"
-    #
-    # updatedAlbumName = strY + dash + strM + albumStr
     updatedAlbumName = dateOBJ.dateObjStr.updateFolderName
     MN = dateOBJ.dateObjStr.monthName
     strY = str(dateOBJ.YYYY)
     strM = str(dateOBJ.MM)
-
+    strD = str(dateOBJ.DD)
 
 
     ftp = FTPlogin()
@@ -315,19 +204,27 @@ def textUpdateArchive():
     with open('archive.html', 'r') as file:
         HTMLfilelines = file.readlines()
 
+    #Note: addLocation_1, addLocation_2, and addLocation_3
+    # are HTML comments that need to be inserted into archive.html.
+    #<!-- Insert new current month --> has to be placed on line 159
+    #<!-- Insert new year --> has to be placed on line 172
+    #<!-- Insert new month --> has to be placed on line 178
 
     addLocation_1 = '<!-- Insert new current month -->'
     addLocation_2 = '<!-- Insert new year -->'
     addLocation_3 = '<!-- Insert new month -->'
     lineToAdd_1 = '\t\t <p class="style1"><a href="http://www.site.com/Albums/monthly_albums/' + updatedAlbumName + '/index.html" class="style2">'+ MN + ' ' + strY + '</a>&nbsp;&nbsp;\n'
-    lineToAdd_2 = addLocation_3 + '\n <tr> <td width="124" align="left" valign="top" class="bltext"><a href="http://www.site.com/Albums/monthly_albums/' + updatedAlbumName + '/index.html">' + MN + ' ' + strY + '</a>&nbsp;&nbsp; </tr>\n'
+    lineToAdd_2 = addLocation_3 + '\n <tr> \n\t\t<td width="124" align="left" valign="top" class="bltext"><a href="http://www.site.com/Albums/monthly_albums/' + updatedAlbumName + '/index.html">' + MN + ' ' + strY + '</a>&nbsp;&nbsp; \n\n</tr>\n'
 
+    #handles the case of a new year
     if MN == "January":
-        lineToAdd_3 = addLocation_2 + '\n<tr>\n<td colspan="2" class="subtitle">'+strY+'</td>\n\t</tr><tr><td width="124" align="left" valign="top" class="bltext"><a href="http://www.site.com/Albums/monthly_albums/' + updatedAlbumName + '/index.html">January' + strY + '</a><br/><br/></tr><tr>\n  '
+        lineToAdd_3 = addLocation_2 + '\n<tr>\n\t\t<td colspan="2" class="subtitle">'+strY+'</td>\n\t</tr>\n\n <!-- Insert new month -->\n <tr><td width="124" align="left" valign="top" class="bltext"><a href="http://www.site.com/Albums/monthly_albums/' + updatedAlbumName + '/index.html">January' + ' ' + strY + '</a><br/><br/>\n\n</tr><tr>\n  '
+        lineToAdd_2 = ''
     else:
         lineToAdd_3 = ''
 
-
+    #Giant chunk  of code that checks for lines to match
+    #and insert the lines that needs to be added and replaced.
     with open(FTPfileName, 'r+') as file:
          HTMLfilelines = file.readlines()
          for i in range(0, len(HTMLfilelines)):
@@ -346,26 +243,13 @@ def textUpdateArchive():
                      file.writelines(HTMLfilelines)
 
 
-
-    #HTMLfilelines[158] = '\t\t  <p class="style1"><a href="http://www.site.com/Albums/monthly_albums/' + updatedAlbumName + '/index.html" class="style2">'+ MN + ' ' + strY + '</a>&nbsp;&nbsp;\n'
-    #HTMLfilelines[174] = '\n <tr> <td width="124" align="left" valign="top" class="bltext"><a href="http://www.site.com/Albums/monthly_albums/' + updatedAlbumName + '/index.html">' + MN + ' ' + strY + '</a>&nbsp;&nbsp; </tr>\n'
-
-    #if MN == "January":
-        #HTMLfilelines[170] = '<tr> <td width="124" align="left" valign="top" class="bltext"><a href="http://www.site.com/Albums/monthly_albums/2021-01album/index.html">January 2020</a>\n<br/><br/>\n</tr>\n<tr> '
-
     with open('archive.html', 'rb') as file:
         ftp.storlines('STOR %s' % 'archive.html', file)
 
 
-#def addLineOperations(lineToAdd, FTPfileName):
-#    with open(FTPfileName, 'w') as file:
-#        file.writelines(HTMLfilelines)
-#    return lineToAdd
-
-
-
 def main():
 
+    #runs everything together.
     updatedFolderName = dateOBJ.dateObjStr.updateFolderName
     FTPLoginFolderCreation()
     unzip()
